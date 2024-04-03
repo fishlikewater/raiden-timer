@@ -2,6 +2,7 @@ package com.github.fishlikewater.timer.core;
 
 import lombok.*;
 
+import java.util.Objects;
 import java.util.concurrent.DelayQueue;
 
 /**
@@ -75,9 +76,8 @@ public class TimeWheel {
     public void advanceLock(long timestamp) {
         if (timestamp > currentTime + tickMs) {
             currentTime = timestamp - (timestamp % tickMs);
-            if (overflowWheel != null) {
-                this.getOverflowWheel().advanceLock(timestamp);
-            }
+            this.determineOverflowWheel(timestamp);
+
         }
     }
 
@@ -94,32 +94,51 @@ public class TimeWheel {
             return false;
         } else {
             // 扔进当前时间轮的某个槽中，只有时间【大于某个槽】，才会放进去
-            if (delayMs < interval) {
-                long virtualId = (expireMs / tickMs);
-                int index = (int) (virtualId % wheelSize);
-                Bucket bucket = buckets[index];
-                bucket.addTask(entry);
-
-                if (bucket.setExpiration(virtualId * tickMs)) {
-                    delayQueue.offer(bucket);
-                    return true;
-                }
-            } else {
-                TimeWheel timeWheel = getOverflowWheel();
-                timeWheel.addTask(entry);
-            }
+            this.addTaskToBucket(entry, expireMs, delayMs);
         }
         return true;
     }
 
     private TimeWheel getOverflowWheel() {
-        if (overflowWheel == null) {
-            synchronized (this) {
-                if (overflowWheel == null) {
-                    overflowWheel = new TimeWheel(interval, wheelSize, currentTime, delayQueue);
-                }
-            }
+        if (Objects.nonNull(this.overflowWheel)) {
+            return this.overflowWheel;
         }
+
+        synchronized (this) {
+            this.buildOverflowWheel();
+        }
+
         return overflowWheel;
+    }
+
+
+    // ---------------------------------------------------------------- PRIVATE
+
+    private void addTaskToBucket(TimerTaskEntry entry, long expireMs, long delayMs) {
+        if (delayMs < interval) {
+            long virtualId = (expireMs / tickMs);
+            int index = (int) (virtualId % wheelSize);
+            Bucket bucket = buckets[index];
+            bucket.addTask(entry);
+
+            if (bucket.setExpiration(virtualId * tickMs)) {
+                delayQueue.offer(bucket);
+            }
+        } else {
+            TimeWheel timeWheel = getOverflowWheel();
+            timeWheel.addTask(entry);
+        }
+    }
+
+    private void determineOverflowWheel(long timestamp) {
+        if (this.getOverflowWheel() != null) {
+            this.getOverflowWheel().advanceLock(timestamp);
+        }
+    }
+
+    private void buildOverflowWheel() {
+        if (overflowWheel == null) {
+            overflowWheel = new TimeWheel(interval, wheelSize, currentTime, delayQueue);
+        }
     }
 }
