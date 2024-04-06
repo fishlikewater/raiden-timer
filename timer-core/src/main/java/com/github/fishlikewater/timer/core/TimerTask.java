@@ -1,6 +1,7 @@
 package com.github.fishlikewater.timer.core;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,11 +15,8 @@ import java.io.Serializable;
  * @since 1.0.0
  */
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class TimerTask implements Runnable, Serializable {
+public abstract class TimerTask implements Runnable, Serializable {
 
     @Serial
     private static final long serialVersionUID = -8435128999145996179L;
@@ -33,21 +31,10 @@ public class TimerTask implements Runnable, Serializable {
 
     private String desc;
 
-    public TimerTask(String desc, long delayMs) {
-        this.desc = desc;
-        this.delayMs = delayMs;
-        this.timerTaskEntry = null;
-    }
-
     public synchronized void setTimerTaskEntry(TimerTaskEntry entry) {
         if (timerTaskEntry != null && timerTaskEntry != entry) {
             timerTaskEntry.remove();
         }
         timerTaskEntry = entry;
-    }
-
-    @Override
-    public void run() {
-
     }
 }

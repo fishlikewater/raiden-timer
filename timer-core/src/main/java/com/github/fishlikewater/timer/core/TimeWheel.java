@@ -77,7 +77,6 @@ public class TimeWheel {
         if (timestamp > currentTime + tickMs) {
             currentTime = timestamp - (timestamp % tickMs);
             this.determineOverflowWheel(timestamp);
-
         }
     }
 

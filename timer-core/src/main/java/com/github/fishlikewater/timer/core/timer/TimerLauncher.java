@@ -4,7 +4,9 @@ import com.github.fishlikewater.timer.core.Bucket;
 import com.github.fishlikewater.timer.core.TimeWheel;
 import com.github.fishlikewater.timer.core.TimerTask;
 import com.github.fishlikewater.timer.core.TimerTaskEntry;
+import com.github.fishlikewater.timer.core.config.TimerConfig;
 import com.github.fishlikewater.timer.core.utils.NamedThreadFactory;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
@@ -37,21 +39,24 @@ public class TimerLauncher implements Timer {
      */
     private final ExecutorService bossThreadPool;
 
+    @Getter
+    private final TimerConfig timerConfig;
 
-    public TimerLauncher() {
-        // TODO 带完善
-        this.timeWheel = new TimeWheel(1, 20, System.currentTimeMillis(), delayQueue);
+
+    public TimerLauncher(TimerConfig timerConfig) {
+        this.timerConfig = timerConfig;
+        this.timeWheel = new TimeWheel(timerConfig.getTickMs(), timerConfig.getWheelSize(), System.currentTimeMillis(), delayQueue);
         this.workerThreadPool = new ThreadPoolExecutor(
-                20,
-                20,
-                1,
-                TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(),
-                new NamedThreadFactory("timer-worker"));
+                timerConfig.getWorkerCoreThreads(),
+                timerConfig.getWorkerMaxThreads(),
+                timerConfig.getWorkerKeepAliveTime(),
+                timerConfig.getWorkerTimeUnit(),
+                timerConfig.getWorkerQueueSize() > 0 ? new LinkedBlockingQueue<>(timerConfig.getWorkerQueueSize()) : new LinkedBlockingQueue<>(),
+                new NamedThreadFactory(timerConfig.getWorkerThreadNamePrefix()));
         this.bossThreadPool = new ThreadPoolExecutor(
                 1,
                 1,
-                1,
+                0,
                 TimeUnit.MINUTES,
                 new LinkedBlockingQueue<>(),
                 new NamedThreadFactory("timer-boss"));
