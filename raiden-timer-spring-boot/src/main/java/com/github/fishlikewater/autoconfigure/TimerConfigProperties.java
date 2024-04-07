@@ -13,42 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.fishlikewater.timer.core.timer;
+package com.github.fishlikewater.autoconfigure;
 
-import com.github.fishlikewater.timer.core.BaseTimerTask;
+import com.github.fishlikewater.timer.core.config.TimerConfig;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * {@code Timer}
- * 定时器接口
+ * {@code TimerConfigProperties}
+ * 参数配置定义
  *
  * @author zhangxiang
- * @date 2024/04/03
+ * @date 2024/04/07
  * @since 1.0.0
  */
-public interface Timer {
-    /**
-     * 添加一个新任务
-     *
-     * @param baseTimerTask {@link BaseTimerTask}
-     */
-    void add(BaseTimerTask baseTimerTask);
+@ConfigurationProperties("raiden.timer")
+public class TimerConfigProperties extends TimerConfig {
 
-    /**
-     * 推动指针
-     *
-     * @param timeout 超时时间
-     */
-    void advanceClock(long timeout);
 
-    /**
-     * 等待执行的任务
-     *
-     * @return {@link Number}
-     */
-    int size();
-
-    /**
-     * 关闭服务,剩下的无法被执行
-     */
-    void shutdown();
 }
