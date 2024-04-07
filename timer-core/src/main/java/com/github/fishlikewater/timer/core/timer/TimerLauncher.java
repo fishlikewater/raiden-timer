@@ -64,13 +64,7 @@ public class TimerLauncher implements Timer {
     public TimerLauncher(TimerConfig timerConfig) {
         this.timerConfig = timerConfig;
         this.timeWheel = new TimeWheel(timerConfig.getTickMs(), timerConfig.getWheelSize(), System.currentTimeMillis(), delayQueue);
-        this.workerThreadPool = new ThreadPoolExecutor(
-                timerConfig.getWorkerCoreThreads(),
-                timerConfig.getWorkerMaxThreads(),
-                timerConfig.getWorkerKeepAliveTime(),
-                timerConfig.getWorkerTimeUnit(),
-                timerConfig.getWorkerQueueSize() > 0 ? new LinkedBlockingQueue<>(timerConfig.getWorkerQueueSize()) : new LinkedBlockingQueue<>(),
-                new NamedThreadFactory(timerConfig.getWorkerThreadNamePrefix()));
+        this.workerThreadPool = Executors.newVirtualThreadPerTaskExecutor();
         this.bossThreadPool = new ThreadPoolExecutor(
                 1,
                 1,

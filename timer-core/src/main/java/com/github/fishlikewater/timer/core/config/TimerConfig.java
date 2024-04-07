@@ -18,7 +18,6 @@ package com.github.fishlikewater.timer.core.config;
 import lombok.Data;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -40,17 +39,4 @@ public class TimerConfig {
      * 始终推进间隔
      */
     private Duration clock;
-
-    private int workerMaxThreads;
-
-    private int workerCoreThreads;
-
-    private int workerKeepAliveTime;
-
-    private TimeUnit workerTimeUnit;
-
-    private int workerQueueSize;
-
-    private String workerThreadNamePrefix;
-
 }

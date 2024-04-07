@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -42,12 +41,6 @@ public class ScheduleTaskTest {
         timerConfig.setTickMs(1000);
         timerConfig.setWheelSize(60);
         timerConfig.setClock(Duration.ofMillis(20));
-        timerConfig.setWorkerCoreThreads(1);
-        timerConfig.setWorkerMaxThreads(20);
-        timerConfig.setWorkerTimeUnit(TimeUnit.MILLISECONDS);
-        timerConfig.setWorkerKeepAliveTime(10);
-        timerConfig.setWorkerQueueSize(0);
-        timerConfig.setWorkerThreadNamePrefix("thread-worker");
 
         timerLauncher = new TimerLauncher(timerConfig);
     }

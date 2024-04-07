@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -42,6 +43,9 @@ public class Bucket implements Serializable, Delayed {
      * bucket的过期时间
      */
     private final AtomicLong expiration = new AtomicLong(-1L);
+
+    ReentrantLock removeLock = new ReentrantLock();
+    ReentrantLock addLock = new ReentrantLock();
 
     {
         root.next = root;
@@ -72,7 +76,8 @@ public class Bucket implements Serializable, Delayed {
         boolean done = false;
         while (!done) {
             entry.remove();
-            synchronized (this) {
+            addLock.lock();
+            try {
                 if (entry.bucket == null) {
                     entry.bucket = this;
                     entry.prev = root.prev;
@@ -81,6 +86,8 @@ public class Bucket implements Serializable, Delayed {
                     root.prev = entry;
                     done = true;
                 }
+            } finally {
+                addLock.unlock();
             }
         }
         return true;
@@ -92,7 +99,8 @@ public class Bucket implements Serializable, Delayed {
      * @param entry 定时任务
      */
     public void remove(TimerTaskEntry entry) {
-        synchronized (this) {
+        removeLock.lock();
+        try {
             if (entry.getBucket().equals(this)) {
                 entry.next.prev = entry.prev;
                 entry.prev.next = entry.next;
@@ -100,6 +108,8 @@ public class Bucket implements Serializable, Delayed {
                 entry.prev = null;
                 entry.bucket = null;
             }
+        } finally {
+            removeLock.unlock();
         }
     }
 

@@ -44,10 +44,11 @@ public class CustCommandLine implements CommandLineRunner {
             @Override
             public void run() {
                 System.out.println(i++);
+                System.out.println(STR."线程ID : \{Thread.currentThread().threadId()}|线程名 : \{Thread.currentThread().getName()}|是否为虚拟线程 : \{Thread.currentThread().isVirtual()}");
             }
         };
         task.setDesc("测试corn任务");
-        task.setCornExpression("0 0/1 * * * ?");
+        task.setCornExpression("0/5 * * * * ?");
         timerLauncher.add(task);
     }
 }
