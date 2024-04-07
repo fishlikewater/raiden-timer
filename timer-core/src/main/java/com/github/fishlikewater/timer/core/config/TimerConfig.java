@@ -2,6 +2,7 @@ package com.github.fishlikewater.timer.core.config;
 
 import lombok.Data;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,6 +20,11 @@ public class TimerConfig {
     private int tickMs;
 
     private int wheelSize;
+
+    /**
+     * 始终推进间隔
+     */
+    private Duration clock;
 
     private int workerMaxThreads;
 

@@ -1,5 +1,6 @@
 package com.github.fishlikewater.timer.core;
 
+import com.github.fishlikewater.timer.core.utils.CronSequenceGenerator;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,21 +19,24 @@ public class TimerTaskEntry implements Comparable<TimerTaskEntry> {
     volatile Bucket bucket;
     TimerTaskEntry next;
     TimerTaskEntry prev;
-    private TimerTask timerTask;
+    private BaseTimerTask baseTimerTask;
+    private CronSequenceGenerator cronSequenceGenerator;
     private long expireMs;
 
-    public TimerTaskEntry(TimerTask timedTask, long expireMs) {
-        this.timerTask = timedTask;
+    public TimerTaskEntry() {}
+
+    public TimerTaskEntry(BaseTimerTask baseTimerTask, long expireMs) {
+        this.baseTimerTask = baseTimerTask;
         this.expireMs = expireMs;
         this.next = null;
         this.prev = null;
     }
 
     void remove() {
-        Bucket currentList = bucket;
-        while (currentList != null) {
-            currentList.remove(this);
-            currentList = bucket;
+        Bucket currentBucket = bucket;
+        while (currentBucket != null) {
+            currentBucket.remove(this);
+            currentBucket = bucket;
         }
     }
 

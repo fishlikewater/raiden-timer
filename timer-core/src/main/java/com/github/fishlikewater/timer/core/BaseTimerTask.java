@@ -3,11 +3,8 @@ package com.github.fishlikewater.timer.core;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
- * {@code TimerTask}
+ * {@code BaseTimerTask}
  * 执行任务
  *
  * @author zhangxiang
@@ -16,14 +13,18 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class TimerTask implements Runnable, Serializable {
+public abstract class BaseTimerTask implements Runnable {
 
-    @Serial
-    private static final long serialVersionUID = -8435128999145996179L;
     /**
      * 延时时间
      */
     private long delayMs;
+
+    /**
+     * corn表达式
+     */
+    private String cornExpression;
+
     /**
      * 任务所在的entry
      */
@@ -37,4 +38,6 @@ public abstract class TimerTask implements Runnable, Serializable {
         }
         timerTaskEntry = entry;
     }
+
+
 }

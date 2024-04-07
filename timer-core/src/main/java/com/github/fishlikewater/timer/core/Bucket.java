@@ -60,10 +60,9 @@ public class Bucket implements Serializable, Delayed {
             synchronized (this) {
                 if (entry.bucket == null) {
                     entry.bucket = this;
-                    TimerTaskEntry tail = root.prev;
-                    entry.prev = tail;
+                    entry.prev = root.prev;
                     entry.next = root;
-                    tail.next = entry;
+                    root.prev.next = entry;
                     root.prev = entry;
                     done = true;
                 }

@@ -1,6 +1,6 @@
 package com.github.fishlikewater.timer.core.timer;
 
-import com.github.fishlikewater.timer.core.TimerTask;
+import com.github.fishlikewater.timer.core.BaseTimerTask;
 
 /**
  * {@code Timer}
@@ -14,9 +14,9 @@ public interface Timer {
     /**
      * 添加一个新任务
      *
-     * @param timerTask {@link com.github.fishlikewater.timer.core.TimerTask}
+     * @param baseTimerTask {@link BaseTimerTask}
      */
-    void add(TimerTask timerTask);
+    void add(BaseTimerTask baseTimerTask);
 
     /**
      * 推动指针

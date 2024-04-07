@@ -74,7 +74,7 @@ public class TimeWheel {
      * @param timestamp 时间戳 {@link  Long}
      */
     public void advanceLock(long timestamp) {
-        if (timestamp > currentTime + tickMs) {
+        if (timestamp >= currentTime + tickMs) {
             currentTime = timestamp - (timestamp % tickMs);
             this.determineOverflowWheel(timestamp);
         }
@@ -124,7 +124,7 @@ public class TimeWheel {
                 delayQueue.offer(bucket);
             }
         } else {
-            TimeWheel timeWheel = getOverflowWheel();
+            TimeWheel timeWheel = this.getOverflowWheel();
             timeWheel.addTask(entry);
         }
     }

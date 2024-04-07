@@ -1,14 +1,17 @@
 package com.github.fishlikewater.timer.core.timer;
 
+import com.github.fishlikewater.timer.core.BaseTimerTask;
 import com.github.fishlikewater.timer.core.Bucket;
 import com.github.fishlikewater.timer.core.TimeWheel;
-import com.github.fishlikewater.timer.core.TimerTask;
 import com.github.fishlikewater.timer.core.TimerTaskEntry;
 import com.github.fishlikewater.timer.core.config.TimerConfig;
+import com.github.fishlikewater.timer.core.utils.CronSequenceGenerator;
 import com.github.fishlikewater.timer.core.utils.NamedThreadFactory;
+import com.github.fishlikewater.timer.core.utils.StringUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.*;
 
 /**
@@ -64,7 +67,7 @@ public class TimerLauncher implements Timer {
         // 20ms推动一次时间轮运转
         this.bossThreadPool.submit(() -> {
             while (true) {
-                this.advanceClock(20);
+                this.advanceClock(timerConfig.getClock().toMillis());
             }
         });
     }
@@ -73,17 +76,30 @@ public class TimerLauncher implements Timer {
     public void addTimerTaskEntry(TimerTaskEntry entry) {
         if (!timeWheel.addTask(entry)) {
             // 任务已到期
-            TimerTask timerTask = entry.getTimerTask();
-            log.info("=====任务:{} 已到期,准备执行============", timerTask.getDesc());
-            workerThreadPool.submit(timerTask);
+            BaseTimerTask baseTimerTask = entry.getBaseTimerTask();
+            log.info("执行任务: {}", baseTimerTask.getDesc());
+            workerThreadPool.submit(baseTimerTask);
+            // corn 表达式任务添加下次时间
+            if (Objects.nonNull(entry.getCronSequenceGenerator())) {
+                entry.setExpireMs(entry.getCronSequenceGenerator().next(System.currentTimeMillis()));
+                this.addTimerTaskEntry(entry);
+            }
         }
     }
 
     @Override
-    public void add(TimerTask timerTask) {
-        log.info("=======添加任务开始====task:{}", timerTask.getDesc());
-        TimerTaskEntry entry = new TimerTaskEntry(timerTask, timerTask.getDelayMs() + System.currentTimeMillis());
-        timerTask.setTimerTaskEntry(entry);
+    public void add(BaseTimerTask baseTimerTask) {
+        log.info("添加任务:{}", baseTimerTask.getDesc());
+        TimerTaskEntry entry;
+        if (StringUtils.hasLength(baseTimerTask.getCornExpression())) {
+            CronSequenceGenerator generator = new CronSequenceGenerator(baseTimerTask.getCornExpression());
+            long expireMs = generator.next(System.currentTimeMillis());
+            entry = new TimerTaskEntry(baseTimerTask, expireMs);
+            entry.setCronSequenceGenerator(generator);
+        } else {
+            entry = new TimerTaskEntry(baseTimerTask, baseTimerTask.getDelayMs() + System.currentTimeMillis());
+        }
+        baseTimerTask.setTimerTaskEntry(entry);
         addTimerTaskEntry(entry);
     }
 
