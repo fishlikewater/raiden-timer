@@ -38,17 +38,21 @@ public class CustCommandLine implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        BaseTimerTask task = new BaseTimerTask() {
-            private int i = 0;
+        for (int i = 0; i < 1; i++) {
+            BaseTimerTask task = new BaseTimerTask() {
+                private int i = 0;
 
-            @Override
-            public void run() {
-                System.out.println(i++);
-                System.out.println(STR."线程ID : \{Thread.currentThread().threadId()}|线程名 : \{Thread.currentThread().getName()}|是否为虚拟线程 : \{Thread.currentThread().isVirtual()}");
-            }
-        };
-        task.setDesc("测试corn任务");
-        task.setCornExpression("0/5 * * * * ?");
-        timerLauncher.add(task);
+                @Override
+                public void run() {
+                    System.out.println(i++);
+                    System.out.println(Thread.currentThread());
+                    System.out.println(STR."线程ID : \{Thread.currentThread().threadId()}|线程名 : \{Thread.currentThread().getName()}|是否为虚拟线程 : \{Thread.currentThread().isVirtual()}");
+                }
+            };
+            task.setDesc(STR."测试corn任务\{i}");
+            task.setCornExpression("0 0/1 * * * ?");
+
+            timerLauncher.add(task);
+        }
     }
 }
