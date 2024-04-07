@@ -15,6 +15,8 @@
  */
 package com.github.fishlikewater.timer.core.utils;
 
+import lombok.NonNull;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -36,7 +38,7 @@ public class NamedThreadFactory implements ThreadFactory {
     }
 
     @Override
-    public Thread newThread(Runnable runnable) {
+    public Thread newThread(@NonNull Runnable runnable) {
         threadNumber.add(1);
         return new Thread(runnable, STR."\{prefix} thread-\{threadNumber.intValue()}");
     }

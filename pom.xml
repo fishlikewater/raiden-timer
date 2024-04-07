@@ -168,6 +168,8 @@
                     <header>${main.user.dir}/HEADER</header>
                     <!--排除文件-->
                     <excludes>
+                        <exclude>**/CronSequenceGenerator.java</exclude>
+                        <exclude>**/StringUtils.java</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>*.sh</exclude>
                         <exclude>*.yml</exclude>

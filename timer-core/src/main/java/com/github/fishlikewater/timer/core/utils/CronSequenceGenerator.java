@@ -1,20 +1,4 @@
-/*
- * Copyright © 2024 zhangxiang (fishlikewater@126.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.github.fishlikewater.timer.core.utils;
-
 
 import java.util.*;
 
@@ -43,6 +27,7 @@ import java.util.*;
  * @author Ruslan Sibgatullin
  * @since 3.0
  */
+@SuppressWarnings("unused")
 public class CronSequenceGenerator {
 
     private final String expression;
@@ -107,13 +92,7 @@ public class CronSequenceGenerator {
     public long next(long date) {
         myCalendar.setTimeZone(this.timeZone);
         myCalendar.setTimeInMillis(date);
-        myCalendar.set(Calendar.MILLISECOND, 0);
-        long originalTimestamp = myCalendar.getTimeInMillis();
-        doNext(myCalendar, myCalendar.get(Calendar.YEAR));
-        if (myCalendar.getTimeInMillis() == originalTimestamp) {
-            myCalendar.add(Calendar.SECOND, 1);
-            doNext(myCalendar, myCalendar.get(Calendar.YEAR));
-        }
+        handleNextTime(myCalendar);
         return myCalendar.getTimeInMillis();
     }
 
@@ -126,38 +105,24 @@ public class CronSequenceGenerator {
      * @return the next value matching the pattern
      */
     public Date next(Date date) {
-		/*
-		The plan:
-
-		1 Start with whole second (rounding up if necessary)
-
-		2 If seconds match move on, otherwise find the next match:
-		2.1 If next match is in the next minute then roll forwards
-
-		3 If minute matches move on, otherwise find the next match
-		3.1 If next match is in the next hour then roll forwards
-		3.2 Reset the seconds and go to 2
-
-		4 If hour matches move on, otherwise find the next match
-		4.1 If next match is in the next day then roll forwards,
-		4.2 Reset the minutes and seconds and go to 2
-		*/
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeZone(this.timeZone);
         calendar.setTime(date);
         // First, just reset the milliseconds and try to calculate from there...
-        calendar.set(Calendar.MILLISECOND, 0);
-        long originalTimestamp = calendar.getTimeInMillis();
-        doNext(calendar, calendar.get(Calendar.YEAR));
-
-        if (calendar.getTimeInMillis() == originalTimestamp) {
-            // We arrived at the original timestamp - round up to the next whole second and try again...
-            calendar.add(Calendar.SECOND, 1);
-            doNext(calendar, calendar.get(Calendar.YEAR));
-        }
+        handleNextTime(calendar);
 
         return calendar.getTime();
+    }
+
+    private void handleNextTime(Calendar myCalendar) {
+        myCalendar.set(Calendar.MILLISECOND, 0);
+        long originalTimestamp = myCalendar.getTimeInMillis();
+        doNext(myCalendar, myCalendar.get(Calendar.YEAR));
+        if (myCalendar.getTimeInMillis() == originalTimestamp) {
+            myCalendar.add(Calendar.SECOND, 1);
+            doNext(myCalendar, myCalendar.get(Calendar.YEAR));
+        }
     }
 
     private void doNext(Calendar calendar, int dot) {
@@ -206,8 +171,7 @@ public class CronSequenceGenerator {
 
     }
 
-    private int findNextDay(Calendar calendar, BitSet daysOfMonth, int dayOfMonth, BitSet daysOfWeek, int dayOfWeek,
-                            List<Integer> resets) {
+    private int findNextDay(Calendar calendar, BitSet daysOfMonth, int dayOfMonth, BitSet daysOfWeek, int dayOfWeek, List<Integer> resets) {
 
         int count = 0;
         int max = 366;
@@ -270,9 +234,8 @@ public class CronSequenceGenerator {
      */
     private void parse(String expression) throws IllegalArgumentException {
         String[] fields = StringUtils.tokenizeToStringArray(expression, " ");
-        if (!areValidCronFields(fields)) {
-            throw new IllegalArgumentException(String.format(
-                    "Cron expression must consist of 6 fields (found %d in \"%s\")", fields.length, expression));
+        if (areValidCronFields(fields)) {
+            throw new IllegalArgumentException(String.format("Cron expression must consist of 6 fields (found %d in \"%s\")", fields.length, expression));
         }
         doParse(fields);
     }
@@ -302,7 +265,7 @@ public class CronSequenceGenerator {
         String[] list = StringUtils.commaDelimitedListToStringArray(commaSeparatedList);
         for (int i = 0; i < list.length; i++) {
             String item = list[i].toUpperCase();
-            value = StringUtils.replace(value.toUpperCase(), item, "" + i);
+            value = StringUtils.replace(value.toUpperCase(), item, STR."\{i}");
         }
         return value;
     }
@@ -346,8 +309,7 @@ public class CronSequenceGenerator {
             } else {
                 String[] split = StringUtils.delimitedListToStringArray(field, "/");
                 if (split.length > 2) {
-                    throw new IllegalArgumentException("Incrementer has more than two fields: '" +
-                            field + "' in expression \"" + this.expression + "\"");
+                    throw new IllegalArgumentException(STR."Incrementer has more than two fields: '\{field}' in expression \"\{this.expression}\"");
                 }
                 int[] range = getRange(split[0], min, max);
                 if (!split[0].contains("-")) {
@@ -355,8 +317,7 @@ public class CronSequenceGenerator {
                 }
                 int delta = Integer.parseInt(split[1]);
                 if (delta <= 0) {
-                    throw new IllegalArgumentException("Incrementer delta must be 1 or higher: '" +
-                            field + "' in expression \"" + this.expression + "\"");
+                    throw new IllegalArgumentException(STR."Incrementer delta must be 1 or higher: '\{field}' in expression \"\{this.expression}\"");
                 }
                 for (int i = range[0]; i <= range[1]; i += delta) {
                     bits.set(i);
@@ -407,7 +368,7 @@ public class CronSequenceGenerator {
             return false;
         }
         String[] fields = StringUtils.tokenizeToStringArray(expression, " ");
-        if (!areValidCronFields(fields)) {
+        if (areValidCronFields(fields)) {
             return false;
         }
         try {
@@ -419,7 +380,7 @@ public class CronSequenceGenerator {
     }
 
     private static boolean areValidCronFields(String[] fields) {
-        return (fields != null && fields.length == 6);
+        return (fields == null || fields.length != 6);
     }
 
 
@@ -431,15 +392,12 @@ public class CronSequenceGenerator {
         if (!(other instanceof CronSequenceGenerator otherCron)) {
             return false;
         }
-        return (this.months.equals(otherCron.months) && this.daysOfMonth.equals(otherCron.daysOfMonth) &&
-                this.daysOfWeek.equals(otherCron.daysOfWeek) && this.hours.equals(otherCron.hours) &&
-                this.minutes.equals(otherCron.minutes) && this.seconds.equals(otherCron.seconds));
+        return (this.months.equals(otherCron.months) && this.daysOfMonth.equals(otherCron.daysOfMonth) && this.daysOfWeek.equals(otherCron.daysOfWeek) && this.hours.equals(otherCron.hours) && this.minutes.equals(otherCron.minutes) && this.seconds.equals(otherCron.seconds));
     }
 
     @Override
     public int hashCode() {
-        return (17 * this.months.hashCode() + 29 * this.daysOfMonth.hashCode() + 37 * this.daysOfWeek.hashCode() +
-                41 * this.hours.hashCode() + 53 * this.minutes.hashCode() + 61 * this.seconds.hashCode());
+        return (17 * this.months.hashCode() + 29 * this.daysOfMonth.hashCode() + 37 * this.daysOfWeek.hashCode() + 41 * this.hours.hashCode() + 53 * this.minutes.hashCode() + 61 * this.seconds.hashCode());
     }
 
     @Override
