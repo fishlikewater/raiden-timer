@@ -16,6 +16,7 @@
 package com.github.fishlikewater.timer.core;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.concurrent.DelayQueue;
@@ -30,6 +31,7 @@ import java.util.concurrent.DelayQueue;
  */
 @Data
 @Builder
+@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -133,8 +135,11 @@ public class TimeWheel {
             long virtualId = (expireMs / tickMs);
             int index = (int) (virtualId % wheelSize);
             Bucket bucket = buckets[index];
-            bucket.addTask(entry);
-
+            boolean b = bucket.addTask(entry);
+            if (!b) {
+                log.error("addTaskToBucket error");
+                return;
+            }
             if (bucket.setExpiration(virtualId * tickMs)) {
                 delayQueue.offer(bucket);
             }

@@ -53,6 +53,4 @@ public abstract class BaseTimerTask implements Runnable {
         }
         timerTaskEntry = entry;
     }
-
-
 }
