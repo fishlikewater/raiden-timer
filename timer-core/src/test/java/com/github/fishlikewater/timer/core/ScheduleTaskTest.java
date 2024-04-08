@@ -38,7 +38,7 @@ public class ScheduleTaskTest {
     @Before
     public void init() {
         final TimerConfig timerConfig = new TimerConfig();
-        timerConfig.setTickMs(1000);
+        timerConfig.setTickMs(Duration.ofSeconds(1));
         timerConfig.setWheelSize(60);
         timerConfig.setClock(Duration.ofMillis(20));
 

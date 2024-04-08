@@ -31,7 +31,7 @@ import java.time.Duration;
 @Data
 public class TimerConfig {
 
-    private int tickMs;
+    private Duration tickMs;
 
     private int wheelSize;
 
