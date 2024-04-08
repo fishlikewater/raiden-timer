@@ -15,6 +15,8 @@
  */
 package com.github.fishlikewater.timer.core;
 
+import lombok.NonNull;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.Delayed;
@@ -28,8 +30,8 @@ import java.util.function.Consumer;
  * 任务桶
  *
  * @author zhangxiang
- * @date 2024/04/03
- * @since 1.0.0
+ * @since 2024/04/03
+ * @version 1.0.0
  */
 public class Bucket implements Serializable, Delayed {
 
@@ -132,7 +134,7 @@ public class Bucket implements Serializable, Delayed {
     }
 
     @Override
-    public int compareTo(Delayed o) {
+    public int compareTo(@NonNull Delayed o) {
         if (o instanceof Bucket bucket) {
             return Long.compare(expiration.get(), bucket.expiration.get());
         }

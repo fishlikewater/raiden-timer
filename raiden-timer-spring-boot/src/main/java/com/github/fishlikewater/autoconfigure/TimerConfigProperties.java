@@ -23,8 +23,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 参数配置定义
  *
  * @author zhangxiang
- * @date 2024/04/07
- * @since 1.0.0
+ * @since 2024/04/07
+ * @version 1.0.0
  */
 @ConfigurationProperties("raiden.timer")
 public class TimerConfigProperties extends TimerConfig {

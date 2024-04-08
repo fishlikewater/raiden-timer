@@ -26,6 +26,7 @@ import java.time.Duration;
  *
  * @author fishlikewater@126.com
  * @since 2024年04月06日 10:30
+ * @version 1.0.0
  **/
 
 @Data

@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
  * 执行任务
  *
  * @author zhangxiang
- * @date 2024/04/03
- * @since 1.0.0
+ * @since  2024/04/03
+ * @version 1.0.0
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

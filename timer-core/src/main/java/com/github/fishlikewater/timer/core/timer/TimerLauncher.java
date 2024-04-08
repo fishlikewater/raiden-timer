@@ -34,8 +34,8 @@ import java.util.concurrent.*;
  * 定时器实现
  *
  * @author zhangxiang
- * @date 2024/04/03
- * @since 1.0.0
+ * @since  2024/04/03
+ * @version 1.0.0
  */
 @Slf4j
 public class TimerLauncher implements Timer {

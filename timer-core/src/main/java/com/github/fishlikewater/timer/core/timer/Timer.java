@@ -22,8 +22,8 @@ import com.github.fishlikewater.timer.core.BaseTimerTask;
  * 定时器接口
  *
  * @author zhangxiang
- * @date 2024/04/03
- * @since 1.0.0
+ * @since 2024/04/03
+ * @version  1.0.0
  */
 public interface Timer {
     /**
