@@ -8,28 +8,30 @@
         <version>${raiden.version}</version>
     </parent>
 
-    <artifactId>raiden-timer-spring-boot-test</artifactId>
-    <name>raiden-timer-spring-boot-test</name>
-    <description>raiden-timer-spring-boot-test</description>
+    <artifactId>raiden-timer-spring-boot-starter</artifactId>
+    <name>raiden-timer-spring-boot-starter</name>
+    <description>raiden-timer-spring-boot-starter</description>
 
     <dependencies>
 
         <dependency>
             <groupId>com.github.fishlikewater</groupId>
-            <artifactId>raiden-timer-spring-boot-starter</artifactId>
+            <artifactId>timer-core</artifactId>
             <version>${raiden.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <optional>true</optional>
         </dependency>
+
     </dependencies>
 
 </project>

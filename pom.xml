@@ -10,7 +10,7 @@
     <name>raiden-timer</name>
     <modules>
         <module>timer-core</module>
-        <module>raiden-timer-spring-boot</module>
+        <module>raiden-timer-spring-boot-starter</module>
         <module>raiden-timer-spring-boot-test</module>
     </modules>
 
